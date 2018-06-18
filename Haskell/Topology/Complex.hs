@@ -10,7 +10,13 @@ If you are expanding this and need to do somthing that scrambles a list
 you should sort everything back afterward
 -}
 
-data Complex = Complex [ (Int,[Trie Int]) ] deriving(Show)
+data Complex = Complex [ (Int,[Trie Int]) ]
+
+instance  Show Complex where
+  show (Complex []) = []::[Char]
+  show (Complex((d,trees):ls)) = concat (["\ndepth: ",show(d)] ++ [ "\n" ++ show(t) | t <- trees]) ++ show(Complex ls)
+
+
 
 dataToComplex:: [[Double]] -> Double -> Complex
 dataToComplex pts epsilon = Complex $ (1,base1):(2,base2): (nextLayers pts epsilon (2,base2) )
