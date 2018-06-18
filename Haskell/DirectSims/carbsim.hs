@@ -1,9 +1,8 @@
-import MainCarbsimlib
+import SimLibs.MainCarbsimlib
 import System.Environment
 
-
-function :: Double -> Double -> [[Double]]
-function = siminterp norwoodEnv newgrowth 1 0.00001
+function :: Double -> Double -> Double -> Double -> [[Double]]
+function = siminterp norwoodEnv newgrowth
 
 
 main = do
