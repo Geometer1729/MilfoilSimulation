@@ -53,12 +53,12 @@ listPairs (Node n ts) =  concat $ fmap ((fmap appendBoth) . listPairs) ts
     appendBoth = (\(x,y) -> (n:x,n:y))
 
 validate:: [Int] -> [Trie Int] -> Bool
-validate simp graph = foldr (&&) True valids
+validate simp graph = and valids
   where
-    subs = [remove s simp | s <- simp]
-    valids = fmap (has graph) subs
+    subs   = [remove s simp | s <- simp]
+    valids = [ (has graph sub) | sub<-subs]
 
-remove  :: Eq a => a -> [a] -> [a]
+remove  :: (Eq a) => a -> [a] -> [a]
 remove blah xs = [ x | x <- xs, x /= blah]
 
 checkPoint :: [[Double]] -> Double -> [Int] -> Bool
@@ -74,3 +74,17 @@ l2 xs ys = dist
     dif = zipWith (-) xs ys
     sqr = fmap (\x->x^2) dif
     dist = sqrt( sum sqr )
+
+
+
+--test code
+getLayer::Complex -> Int -> [Trie Int]
+getLayer (Complex ((n,ts):ls)) tl
+  |(n == tl) = ts
+  |otherwise = getLayer (Complex ls) tl
+
+grid::[[Double]]
+grid = [[x,y] | x<- [0..3],y<-[0..3]]
+
+comp = dataToComplex grid 1.1
+layer2 = getLayer comp 2

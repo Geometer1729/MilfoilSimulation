@@ -64,11 +64,11 @@ has:: [Trie Int] -> [Int] -> Bool
 has ((Node n ns):ts) (x:xs)
   |(n == x) = has  ns xs
   |otherwise = has ts (x:xs)
-has (Leaf l:ls) (x:[])
+has ((Leaf l):ls) (x:[])
   | l == x = True
   | otherwise = has ls (x:[])
-has l [] = False
-has _ _ = error "checked list of the wrong length"
+has [] l = False
+has ts list = error ( concat ["checked list of the wrong length ", "trees  ", concat [show( t) | t<- ts] ,"checking  " , concat [show(l) | l <- list] ] )
 
 treeLength:: [Trie Int] -> Int
 treeLength ((Node a ns):ts) = treeLength ns + treeLength ts
@@ -91,3 +91,10 @@ indexTree ((SNode (i,n) ns):ts) ind
 indexTree ((SLeaf l):ls) ind
   | ind == 0 = [l]
   | otherwise = indexTree ls (ind-1)
+
+
+--test code
+list:: [[Int]]
+list = [[1,2],[1,3],[2,3]]
+testTree:: [Trie Int]
+testTree = treeFromList list
