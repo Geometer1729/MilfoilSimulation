@@ -3,6 +3,15 @@ module Topology.Tries where
 data Trie a = Leaf a | Node a [(Trie a)] deriving(Show)
 data STrie a = SLeaf a | SNode (Int,a) [STrie a]  deriving(Show) --Tree that knows it's size usefull for indexing
 
+
+instance (Show a) => Show (Trie a) where
+  show t = shw 0 t
+
+shw:: (Show a) => Int -> Trie a -> [Char]
+shw depth (Leaf l) = concat ["\n",(repList "    " depth),"L ",show(l)]
+shw depth (Node n ts) = concat (["\n",(repList "    " depth),"N ",show(n)]  ++ [shw (depth+1) t | t<-ts])
+
+
 treeFromList:: (Eq a) => [[a]] -> [Trie a]
 treeFromList (x:xs) = treeBuild start xs
   where
