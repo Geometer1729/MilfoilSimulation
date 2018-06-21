@@ -61,9 +61,9 @@ lambdafunc lambda0 thetar tb temp = lambda0 * ( thetar ** (temp - tb))
 buildStrain :: Double -> Double -> Double -> Double -> Double -> Double -> Double -> Double -> Double -> Double -> Double ->  Strain
 buildStrain mew0 ps km k1 thetag delta lambda0 thetar tb mew1 chm
     = Strain mew0 ps km k1 thetag delta tb (lambdafunc lambda0 thetar tb) mew1 chm
-
-oldgrowth :: GrowthFunc -- enviornment biomass carbs day -> change
-oldgrowth = GrowthFunc growth
+--uniform biomass growth
+ubgrowth :: GrowthFunc -- enviornment biomass carbs day -> change
+ubgrowth = GrowthFunc growth
   where
     growth _ 0 _ _  = (0,0)
     growth env m c day = (dm , dc)
@@ -88,9 +88,9 @@ oldgrowth = GrowthFunc growth
             im = i0_ * exp( -(kwt_)*(height - d_))
             ird_ = i0_ * exp(-(kwt_*d_+ km_*m))
             mew1_ = mew1 strain_
-
-newgrowth :: GrowthFunc -- enviornment biomass carbs day -> change
-newgrowth = GrowthFunc growth
+--Clear Watter Growth
+cwgrowth :: GrowthFunc -- enviornment biomass carbs day -> change
+cwgrowth = GrowthFunc growth
   where
     growth _ 0 _ _  = (0,0)
     growth env m c day = (dm , dc)

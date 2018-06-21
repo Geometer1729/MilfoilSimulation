@@ -1,4 +1,4 @@
-import Mainsimlib
+import SimLibs.Mainsimlib
 import System.Environment
 
 altSeason:: Double -> Season

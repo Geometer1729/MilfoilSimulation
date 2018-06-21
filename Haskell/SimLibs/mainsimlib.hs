@@ -1,6 +1,6 @@
-module Mainsimlib where
+module SimLibs.Mainsimlib where
 
-import Interpelation
+import Interpelation.Interpelation
 
 data Strain = Strain {
   mew0 :: Double

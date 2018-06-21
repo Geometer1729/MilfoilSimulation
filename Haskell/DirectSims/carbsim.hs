@@ -2,7 +2,7 @@ import SimLibs.MainCarbsimlib
 import System.Environment
 
 function :: Double -> Double -> Double -> Double -> [[Double]]
-function = siminterp norwoodEnv newgrowth
+function = siminterp norwoodEnv cwgrowth
 
 
 main = do

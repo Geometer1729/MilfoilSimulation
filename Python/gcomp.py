@@ -4,7 +4,7 @@ import numpy as np
 
 def sim(step,err,m,c):
     inputs= [step,err,m,c]
-    path = "../Haskell"
+    path = "../Haskell/Tests"
     file = "gcomp.exe"
     str=ht.runexe(inputs,path,file)
     return (str.split('[[')[1]).split(']]')[0]
