@@ -2,7 +2,8 @@
 import SimLibs.MainCarbsimlib
 import System.Environment
 import Data.List
-import FuncToExe.FuncToExe
+import FuncToIO.FuncToIO
+import Dynamify.Dynamify
 
 type PhaseEnd = Frame -> Bool
 data Phase = Dif (Enviornment,GrowthFunc,PhaseEnd) | Dynamic (Frame -> Frame)
@@ -101,8 +102,11 @@ simdata  ps err start step stop = [ [x,(smartSeasonCarb ps x err),((smartSeasonC
 standPhase::[Phase]
 standPhase = [preSurface,postSurface,winter]
 
-wevilReduct::Double->Double
-wevilReduct x = stable (mapN 2 (wevilPhase x) standPhase ) 0.1 0.000001
+wevilReduct::Double->Double->Double
+wevilReduct x err = stable (mapN 2 (wevilPhase x) standPhase ) 0.1 err
+
+dynamicWevilReduct::Double->Double->Double
+dynamicWevilReduct = (dynamify wevilReduct (\x y -> abs (x-y) ) )
 
 mapN::Int->(a->a) -> [a] -> [a]
 mapN n f xs = (map f (take n xs)) ++ (drop n xs)
@@ -111,4 +115,4 @@ wevilPhase::Double->Phase->Phase
 wevilPhase x (Dif (e,g,p)) = (Dif (e , wevil x g,p))
 
 main::IO ()
-main = funcToWrite3 (\a b c -> map wevilReduct [a,a+b..c])
+main = funcToWrite (\a b c d -> map (flip dynamicWevilReduct d) [a,a+b..c])

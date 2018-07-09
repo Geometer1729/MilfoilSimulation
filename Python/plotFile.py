@@ -12,6 +12,6 @@ file.close()
 
 x=ht.readarray(out)
 x = np.array(x)
-x = np.transpose(x)
+#x = np.transpose(x)
 
 ht.plot(x)

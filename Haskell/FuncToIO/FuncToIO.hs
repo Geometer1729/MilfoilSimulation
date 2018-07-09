@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances , UndecidableInstances , IncoherentInstances , MonoLocalBinds #-}
 
-module FuncToIO (funcToExe , funcToWrite) where
+module FuncToIO.FuncToIO (funcToExe , funcToWrite) where
 
 import System.IO
 import System.Process
