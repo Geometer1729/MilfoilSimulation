@@ -39,12 +39,19 @@ data Frame = Frame{
 , dm :: Double
 , c:: Double
 , dc:: Double
-}deriving (Show)
+}deriving (Show,Eq)
 
 data Simulation = Simulation {
   frames :: [Frame]
 , env :: Enviornment
-}
+} | DyStep {stepFrame :: Frame}
+
+instance Eq Simulation where
+  (==) (Simulation frames1 _ ) (Simulation frames2 _ ) = (frames1 == frames2 )
+  (==) (DyStep f1) (DyStep f2) = (f1 == f2)
+  (==) _ _ = False
+
+
 
 data GrowthFunc = GrowthFunc { growthFunc :: (Enviornment -> Double -> Double -> Double -> (Double,Double))}
 
@@ -95,8 +102,8 @@ cwgrowth = GrowthFunc growth
     growth _ 0 _ _  = (0,0)
     growth env m c day = (dm , dc)
         where
-            dc = carbflux
-            dm = (mewt_/km_)*log((k1_+i0_)/(k1_+ird_)) - carbflux
+            dc = dm*(0.06/0.94)
+            dm = (mewt_/km_)*log((k1_+i0_)/(k1_+ird_)) * 0.94
             carbflux = -mew1_ * c * (msat/(1+msat))
             msat = m/(chm strain_)
             strain_ = strain env
@@ -115,6 +122,9 @@ cwgrowth = GrowthFunc growth
             im = i0_ * exp( -(kwt_)*(height - d_))
             ird_ = i0_ * exp(-(kwt_*d_+ km_*m))
             mew1_ = mew1 strain_
+
+
+
 
 
 mewt :: Strain -> Double -> Double --strain temp
@@ -136,13 +146,13 @@ framegen step err env growthF f
 
 smartStep :: GrowthFunc -> Frame -> Enviornment -> Double -> Double -> Frame
 smartStep growthF f env maxStep mErr
-  | err<mErr = byhstp
+  | err_<mErr = byhstp
   | otherwise = smartStep growthF f env (maxStep/2) (mErr/2)
   where
       halfstep = frameStep growthF env (maxStep/2)
       byhstp = (halfstep . halfstep) f
       bystp = frameStep growthF env maxStep f
-      err = (((m byhstp)-(m bystp))^2+ ((c byhstp)-(c bystp))^2)**(0.5)--implement smarter norm here
+      err_ = (((m byhstp)-(m bystp))^2+ ((c byhstp)-(c bystp))^2)**(0.5)--implement smarter norm here
 
 frameStep ::  GrowthFunc -> Enviornment ->  Double -> Frame -> Frame
 frameStep growthF env step f = Frame (t_+step) (m_+(k1+2*k2+2*k3+k4)/6) dm (c_+(l1+2*l2+2*l3+l4)/6) dc
@@ -168,6 +178,16 @@ siminterp env growthF step err m_ c_ = interpelate x frames_ [m,c] [dm,dc] t
     len = (days . season) env
     sim = simulate growthF env step err m_ c_
     frames_ = frames sim
+
+wevil::Double->GrowthFunc->GrowthFunc
+wevil w (GrowthFunc f) = GrowthFunc newfunc
+  where
+    newfunc::Enviornment->Double->Double->Double->(Double,Double)
+    newfunc a b c d =  (\(x,y) -> (x-w,y)) (f a b c d)
+
+
+
+
 
 -- Generate norwood lake enviornment
 _kwt :: Double -- light atenuation coefficient (water clarity)
@@ -211,6 +231,5 @@ norwoodEnv = Enviornment norwood genStrain genSeason
 
 norwood = Lake _kwt _d
 genStrain = buildStrain _mew0 _ps _km _k1 _thetag _delta  _lambda0 _thetar _tb _mew1 _chm
---buildStrain mew0 ps km k1 thetag delta lambda0 thetar tb mew1 chm
 genSeason = buildseason _days 25 80 50 115
 norwoodEnv = Enviornment norwood genStrain genSeason
