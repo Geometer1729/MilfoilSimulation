@@ -3,7 +3,6 @@ module Haskell.PhaseLib (dynamicWevilReduct) where
 import           Data.List
 import           Haskell.Dynamify
 import           Haskell.MainCarbsimlib
-import           Haskell.Util.FuncToIO
 import           System.Environment
 import           System.IO
 import           System.Process
