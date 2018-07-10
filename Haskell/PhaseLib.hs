@@ -4,20 +4,22 @@ import           Dynamify
 import           FuncToIO
 import           MainCarbsimlib
 import           System.Environment
+import           System.IO
+import           System.Process
 
 type PhaseEnd = Frame -> Bool
 data Phase = Dif (Enviornment,GrowthFunc,PhaseEnd) | Dynamic (Frame -> Frame)
 
 wholeSim :: [Phase] -> Double -> Double -> Double -> Double -> [Simulation]
-wholeSim ps m c step err = multiphase ps f step err
+wholeSim ps m c  = multiphase ps f
   where
     f = Frame 0 m dm c dc ::Frame
-    (dm,dc) = (growthFunc intitgrowth) ienv m c 0 ::(Double,Double)
-    (Dif (ienv,intitgrowth,_)) = ps!!0
+    (dm,dc) = growthFunc intitgrowth ienv m c 0 ::(Double,Double)
+    (Dif (ienv,intitgrowth,_)) = head ps
 
 multiphase :: [Phase] ->  Frame -> Double -> Double -> [Simulation]
 multiphase [] _ _ _ = []
-multiphase ((Dif p):ps) f step err = thisSim:(multiphase ps ef step err)
+multiphase (Dif p:ps) f step err = thisSim : multiphase ps ef step err
   where
     (env,gf,con) = p
     thisSim =  Simulation (condFramegen con step err env gf f) env
@@ -89,10 +91,11 @@ stable:: [Phase] -> Double -> Double -> Double
 stable ps x err = numLim err (genFuture ps x err)
 
 numLim::Double -> [Double] -> Double
-numLim eps ls = snd $ head $ filter difcheck ps --gabe wrote this function for me
+numLim eps ls = snd $ filter difcheck ps !! 20 --gabe wrote this function for me -- I then changed it to use the 10th term
   where
-    ps = (zip ls (tail ls))
-    difcheck = (\(x,y) -> (abs (x-y)) < eps)
+    ps = zip ls (tail ls)
+    difcheck:: (Double,Double) -> Bool
+    difcheck (x,y) = abs (x-y) < eps
 
 simdata::[Phase] -> Double -> Double -> Double -> Double -> [[Double]]
 simdata  ps err start step stop = [ [x,(smartSeasonCarb ps x err),((smartSeasonCarb ps x err)-(smartSeasonCarb ps (x+eps) err))/eps] | x<- [start,(start+step)..stop] ]
@@ -115,4 +118,5 @@ wevilPhase::Double->Phase->Phase
 wevilPhase x (Dif (e,g,p)) = (Dif (e , wevil x g,p))
 
 main::IO ()
-main = funcToWrite (\a b c d -> map (flip dynamicWevilReduct d) [a,a+b..c])
+main = do
+  funcToPlot (\a b c d -> map (flip dynamicWevilReduct d) [a,a+b..c])

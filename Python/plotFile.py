@@ -3,7 +3,7 @@ import numpy as np
 import haskelltalking as ht
 from mpl_toolkits.mplot3d import Axes3D
 
-file = open("wevilEqlb.txt",)
+file = open("data.txt",)
 out=""
 for line in file:
     out += line

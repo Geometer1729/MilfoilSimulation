@@ -3,9 +3,11 @@
 {-# LANGUAGE MonoLocalBinds       #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module FuncToIO (funcToExe , funcToWrite) where
+
+module FuncToIO (funcToExe , funcToWrite, funcToPlot) where
 
 import           System.Environment
+import           System.Process
 
 data MaybeFuncTo a = FuncTo (String -> MaybeFuncTo a) | Plain a
 
@@ -34,3 +36,10 @@ funcToWrite f = do
     args <- getArgs
     let fileName = head args
     writeFile fileName (app (cast f) (drop 1 args))
+
+funcToPlot :: (Cast a) => a -> IO ()
+funcToPlot f = do
+  args <- getArgs
+  writeFile "Data.txt" (app (cast f) args)
+  putStrLn "On to python"
+  callCommand "python plotfile.py"

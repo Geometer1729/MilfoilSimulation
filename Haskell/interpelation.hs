@@ -1,4 +1,4 @@
-module Interpelation where
+module Interpelation (interpelate) where
 
 --ts are new domain
 --xs are original domain
@@ -12,14 +12,16 @@ findFrames (t:ts) (x1:x2:xs) (a:as)
     thisgap = abs (x1-t)
     nextgap = abs (x2-t)
 findFrames [] _ _ = []
-findFrames (t:ts) (x:[]) (a:[]) = a : findFrames ts (x:[]) (a:[])
+findFrames (_:ts) [x] [a] = a : findFrames ts [x] [a]
+findFrames _ [] _ = error "Can't interpelate from empty list"
+findFrames _ _ _ = error "Weird list given to interp"
 
-interpelate:: [Double] -> [a] -> [(a->Double)] -> [(a->Double)] -> (a->Double) -> [[Double]]
+interpelate:: [Double] -> [a] -> [a->Double] -> [a->Double] -> (a->Double) -> [[Double]]
 interpelate ts allFrames valFuncs dirFuncs timeFunc = interp
   where
     frames = findFrames ts xs allFrames
     vals   = [ [valfunc frame | valfunc <- valFuncs] | frame <- frames]
     derivs = [ [dirfunc frame | dirfunc <- dirFuncs] | frame <- frames]
     jumps  = zipWith (-) ts (fmap timeFunc frames)
-    interp = zipWith (zipWith (+)) vals [[deriv * jump | deriv <- derivframe] | (jump,derivframe) <- (zip jumps derivs)]
+    interp = zipWith (zipWith (+)) vals [[deriv * jump | deriv <- derivframe] | (jump,derivframe) <- zip jumps derivs]
     xs = fmap timeFunc allFrames
