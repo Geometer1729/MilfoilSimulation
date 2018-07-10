@@ -1,4 +1,4 @@
-module Topology.Tries where
+module Haskell.Tries where
 
 data Trie a = Leaf a | Node a [(Trie a)]
 data STrie a = SLeaf a | SNode (Int,a) [STrie a]  deriving(Show) --Tree that knows it's size usefull for indexing
@@ -24,7 +24,7 @@ treeFromList [] = []
 treeBuild:: (Eq a) => [Trie a] -> [[a]] -> [Trie a]
 treeBuild tree (l:[]) = treeAdd tree l
 treeBuild tree (l:ls) = treeBuild (treeAdd tree l) ls
-treeBuild tree [] = tree
+treeBuild tree []     = tree
 
 treeAdd:: (Eq a) => [Trie a] -> [a] -> [Trie a]
 treeAdd ((Node n ns):[]) (x:xs)
@@ -50,7 +50,7 @@ treeSizer (Node n ns) = (SNode (size,n) subTrees)
 treeSizer (Leaf x) =  SLeaf x
 
 getSize:: STrie a -> Int
-getSize (SLeaf x) = 1
+getSize (SLeaf x)        = 1
 getSize (SNode (s,x) xs) = s
 
 upTree:: (Int,Int) -> Trie Int
@@ -72,8 +72,8 @@ has ts list = error ( concat ["checked list of the wrong length ", "trees  ", co
 
 treeLength:: [Trie Int] -> Int
 treeLength ((Node a ns):ts) = treeLength ns + treeLength ts
-treeLength [] = 0
-treeLength ((Leaf a):ls) = 1 + treeLength ls
+treeLength []               = 0
+treeLength ((Leaf a):ls)    = 1 + treeLength ls
 
 getIndex:: (Eq a) => [STrie a] -> [a] ->  Int
 getIndex ((SNode (s,n) ns):ts) (x:xs)

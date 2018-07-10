@@ -1,10 +1,11 @@
-import MainCarbsimlib
-import System.Environment
+import           Haskell.Util.FuncToIO
+import           Haskell.MainCarbsimlib
+import           System.Environment
 
 startCtoEndM :: Double -> Double -> Double
 startCtoEndM err c_ = m_ + (dm_ * (end - t_))
   where
-    frame_ =  (head . reverse . frames) (simulate norwoodEnv 4 err 1 c_)
+    frame_ =  (last . frames) (simulate norwoodEnv 4 err 1 c_)
     end = (days . season) norwoodEnv
     t_ = t frame_
     m_ = m frame_
@@ -12,7 +13,7 @@ startCtoEndM err c_ = m_ + (dm_ * (end - t_))
 
 
 adaptiveSCEM :: Double -> Double -> Double
-adaptiveSCEM err c_ = adaptiveSCEMs err err c_
+adaptiveSCEM err  = adaptiveSCEMs err err
 
 adaptiveSCEMs ::Double -> Double -> Double -> Double
 adaptiveSCEMs errmax errcur c_
@@ -20,7 +21,7 @@ adaptiveSCEMs errmax errcur c_
   |otherwise = adaptiveSCEMs errmax (errcur/2) c_
   where
     result = startCtoEndM (errcur/2) c_
-    err = result - (startCtoEndM errcur c_)
+    err = result - startCtoEndM errcur c_
 
 gendata :: Double -> Double ->[Double]
 gendata err max_  = fmap (adaptiveSCEM err) [0,1..max_]
@@ -28,6 +29,4 @@ gendata err max_  = fmap (adaptiveSCEM err) [0,1..max_]
 
 
 
-main = do
-    instr <- getArgs
-    putStrLn (show(gendata (read (instr!!0) :: Double) (read (instr!!1) :: Double)  ))
+main = funcToExe gendata

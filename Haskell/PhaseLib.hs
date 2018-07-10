@@ -1,8 +1,9 @@
--- module PhaseLib where
+module Haskell.PhaseLib (dynamicWevilReduct) where
+
 import           Data.List
-import           Dynamify
-import           FuncToIO
-import           MainCarbsimlib
+import           Haskell.Dynamify
+import           Haskell.MainCarbsimlib
+import           Haskell.Util.FuncToIO
 import           System.Environment
 import           System.IO
 import           System.Process
@@ -116,7 +117,3 @@ mapN n f xs = (map f (take n xs)) ++ (drop n xs)
 
 wevilPhase::Double->Phase->Phase
 wevilPhase x (Dif (e,g,p)) = (Dif (e , wevil x g,p))
-
-main::IO ()
-main = do
-  funcToPlot (\a b c d -> map (flip dynamicWevilReduct d) [a,a+b..c])

@@ -1,6 +1,6 @@
-module MainCarbsimlib where
+module Haskell.MainCarbsimlib where
 
-import Interpelation
+import Haskell.Util.Interpelation
 
 data Strain = Strain {
   mew0 :: Double
@@ -47,8 +47,8 @@ data Simulation = Simulation {
 } | DyStep {stepFrame :: Frame}
 
 instance Eq Simulation where
-  (==) (Simulation frames1 _ ) (Simulation frames2 _ ) = (frames1 == frames2 )
-  (==) (DyStep f1) (DyStep f2) = (f1 == f2)
+  (==) (Simulation frames1 _ ) (Simulation frames2 _ ) = frames1 == frames2
+  (==) (DyStep f1) (DyStep f2) = f1 == f2
   (==) _ _ = False
 
 
