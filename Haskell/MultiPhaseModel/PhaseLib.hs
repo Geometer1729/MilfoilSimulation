@@ -1,9 +1,9 @@
 -- module PhaseLib where
-import SimLibs.MainCarbsimlib
-import System.Environment
-import Data.List
-import FuncToIO.FuncToIO
-import Dynamify.Dynamify
+import           Data.List
+import           Dynamify
+import           FuncToIO
+import           MainCarbsimlib
+import           System.Environment
 
 type PhaseEnd = Frame -> Bool
 data Phase = Dif (Enviornment,GrowthFunc,PhaseEnd) | Dynamic (Frame -> Frame)
@@ -22,13 +22,13 @@ multiphase ((Dif p):ps) f step err = thisSim:(multiphase ps ef step err)
     (env,gf,con) = p
     thisSim =  Simulation (condFramegen con step err env gf f) env
     ef = endState thisSim
-multiphase ((Dynamic p):ps) f step err = (DyStep ef) :(multiphase ps ef step err)
+multiphase (Dynamic p:ps) f step err = DyStep ef :multiphase ps ef step err
   where
     ef = p f
 
 condFramegen :: (Frame -> Bool) -> Double -> Double -> Enviornment -> GrowthFunc -> Frame -> [Frame]
 condFramegen cond step err env growthF f
-  | (not ((cond f)) && (adjStep > 0)) = f : condFramegen cond step err env growthF nextFrame
+  | not (cond f) && (adjStep > 0) = f : condFramegen cond step err env growthF nextFrame
   | otherwise = [f]
       where
         nextFrame = (smartStep growthF f env adjStep err) :: Frame
@@ -38,14 +38,14 @@ condFramegen cond step err env growthF f
 
 endState::Simulation->Frame
 endState (Simulation f _ ) = last f
-endState (DyStep s) = s
+endState (DyStep s)        = s
 
 keyFrames::[Simulation]->[Frame]
 keyFrames sims = concat [getFrames sim | sim <- sims]
   where
     getFrames::Simulation->[Frame]
     getFrames (DyStep sim) = [(stepFrame (DyStep sim))]
-    getFrames sim = frames sim
+    getFrames sim          = frames sim
 
 
 --phases
