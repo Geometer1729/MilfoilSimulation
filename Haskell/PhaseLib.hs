@@ -1,8 +1,8 @@
 -- module PhaseLib where
 import           Data.List
-import           Dynamify.Dynamify
-import           FuncToIO.FuncToIO
-import           SimLibs.MainCarbsimlib
+import           Dynamify
+import           FuncToIO
+import           MainCarbsimlib
 import           System.Environment
 
 type PhaseEnd = Frame -> Bool

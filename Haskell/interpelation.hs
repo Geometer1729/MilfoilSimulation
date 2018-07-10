@@ -1,4 +1,4 @@
-module Interpelation.Interpelation where
+module Interpelation where
 
 --ts are new domain
 --xs are original domain
