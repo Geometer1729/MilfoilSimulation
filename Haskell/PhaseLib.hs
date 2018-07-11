@@ -1,11 +1,9 @@
 module Haskell.PhaseLib (dynamicWevilReduct) where
 
-import           Data.List
+-- import           Data.List
 import           Haskell.Dynamify
 import           Haskell.MainCarbsimlib
-import           System.Environment
-import           System.IO
-import           System.Process
+
 
 type PhaseEnd = Frame -> Bool
 data Phase = Dif (Enviornment,GrowthFunc,PhaseEnd) | Dynamic (Frame -> Frame)
@@ -33,8 +31,8 @@ condFramegen cond step err env growthF f
   | not (cond f) && (adjStep > 0) = f : condFramegen cond step err env growthF nextFrame
   | otherwise = [f]
       where
-        nextFrame = (smartStep growthF f env adjStep err) :: Frame
-        adjStep =  (min step (days_ - t_))
+        nextFrame = smartStep growthF f env adjStep err :: Frame
+        adjStep =  min step (days_ - t_)
         days_ = (days . season) env
         t_ = t f
 
@@ -46,7 +44,7 @@ keyFrames::[Simulation]->[Frame]
 keyFrames sims = concat [getFrames sim | sim <- sims]
   where
     getFrames::Simulation->[Frame]
-    getFrames (DyStep sim) = [(stepFrame (DyStep sim))]
+    getFrames (DyStep sim) = [stepFrame (DyStep sim)]
     getFrames sim          = frames sim
 
 
@@ -57,7 +55,7 @@ preSurface = Dif (env,gf,preend)
     env = Enviornment norwood genStrain (buildseason 50 25 80 50 115)
     gf = ubgrowth
     preend::Frame -> Bool
-    preend f = (m f) > ((d (lake env)) * (ps (strain env)))
+    preend f = m f > d (lake env) * ps (strain env)
 
 postSurface::Phase
 postSurface = Dif (env,gf,postend)
@@ -65,13 +63,13 @@ postSurface = Dif (env,gf,postend)
     env = Enviornment norwood genStrain (buildseason 100 25 80 50 115)
     gf = cwgrowth
     postend::Frame -> Bool
-    postend f = (t f) >= 100
+    postend f = t f >= 100
 
 winter::Phase
-winter = Dynamic (cold)
+winter = Dynamic cold
   where
     cold::Frame -> Frame -- also sets the season time back to 0
-    cold f = (Frame 0 1 0 (0.6*c_) 0)
+    cold f = Frame 0 1 0 (0.6*c_) 0
       where
         c_ = c f
 
@@ -81,11 +79,11 @@ seasonCarb ps x err =  (c . endState . last ) (wholeSim ps 1 x 1 err)
 smartSeasonCarb:: [Phase] -> Double->Double->Double
 smartSeasonCarb ps x err = numLim  err results
   where
-    results = [(seasonCarb ps x (err/(2^(n)))) | n <- [1..] ]
+    results = [seasonCarb ps x (err/(2^n)) | n <- [1..] ]
 
 
 genFuture:: [Phase] -> Double->Double->[Double]
-genFuture ps x err = x : (genFuture ps (smartSeasonCarb ps err x) err)
+genFuture ps x err = x : genFuture ps (smartSeasonCarb ps err x) err
 
 stable:: [Phase] -> Double -> Double -> Double
 stable ps x err = numLim err (genFuture ps x err)
@@ -98,7 +96,7 @@ numLim eps ls = snd $ filter difcheck ps !! 20 --gabe wrote this function for me
     difcheck (x,y) = abs (x-y) < eps
 
 simdata::[Phase] -> Double -> Double -> Double -> Double -> [[Double]]
-simdata  ps err start step stop = [ [x,(smartSeasonCarb ps x err),((smartSeasonCarb ps x err)-(smartSeasonCarb ps (x+eps) err))/eps] | x<- [start,(start+step)..stop] ]
+simdata  ps err start step stop = [ [x,smartSeasonCarb ps x err,(smartSeasonCarb ps x err- smartSeasonCarb ps (x+eps) err)/eps] | x<- [start,(start+step)..stop] ]
   where
     eps=0.000000001
 
@@ -106,13 +104,13 @@ standPhase::[Phase]
 standPhase = [preSurface,postSurface,winter]
 
 wevilReduct::Double->Double->Double
-wevilReduct x err = stable (mapN 2 (wevilPhase x) standPhase ) 0.1 err
+wevilReduct x = stable (mapN 2 (wevilPhase x) standPhase ) 0.1
 
 dynamicWevilReduct::Double->Double->Double
-dynamicWevilReduct = (dynamify wevilReduct (\x y -> abs (x-y) ) )
+dynamicWevilReduct = dynamify wevilReduct (\x y -> abs (x-y) )
 
 mapN::Int->(a->a) -> [a] -> [a]
-mapN n f xs = (map f (take n xs)) ++ (drop n xs)
+mapN n f xs = map f (take n xs) ++ drop n xs
 
 wevilPhase::Double->Phase->Phase
-wevilPhase x (Dif (e,g,p)) = (Dif (e , wevil x g,p))
+wevilPhase x (Dif (e,g,p)) = Dif (e , wevil x g,p)

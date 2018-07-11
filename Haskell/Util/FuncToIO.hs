@@ -41,4 +41,11 @@ funcToPlot f = do
   args <- getArgs
   writeFile "Data.txt" (app (cast f) args)
   putStrLn "On to python"
+  writeFile "plotfile.py" plotFileCode
   callCommand "python plotfile.py"
+
+plotFileCode::String
+plotFileCode = concat [ x ++ "\n" | x<- xs]
+  where
+    xs = ["import matplotlib.pyplot as plt" , "import numpy as np",    "from mpl_toolkits.mplot3d import Axes3D",  teribleString ,  "out= (''.join ( [c for line in file for c in line] [1:-1] ))" ,  "x = [float(x) for x in out.split(',')]",  "file.close()",  "plt.plot(range(0,len(x)),x)", "plt.show()" ] ::[String]
+    teribleString = "file = open(\"data.txt\",)" :: String
