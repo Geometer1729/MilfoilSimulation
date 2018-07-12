@@ -1,4 +1,4 @@
-module Haskell.Dynamify (dynamify) where
+module Haskell.Util.Dynamify (dynamify) where
 
 dynamify::  (a -> Double ->  b) -> (b-> b -> Double) -> a -> Double ->  b
 dynamify func norm input tol = rollingDynamify func norm tol tol input

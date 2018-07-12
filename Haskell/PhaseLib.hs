@@ -1,8 +1,8 @@
 module Haskell.PhaseLib (dynamicWevilReduct) where
 
 -- import           Data.List
-import           Haskell.Dynamify
 import           Haskell.MainCarbsimlib
+import           Haskell.Util.Dynamify
 
 
 type PhaseEnd = Frame -> Bool
