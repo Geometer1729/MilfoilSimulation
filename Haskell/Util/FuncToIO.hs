@@ -3,14 +3,14 @@
 {-# LANGUAGE MonoLocalBinds       #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Haskell.Util.FuncToIO (funcToExe , funcToWrite) where
+module Haskell.Util.FuncToIO (funcToExe , funcToWrite ,funcToPlot) where
 
 import           System.Environment
 import           System.Process
 
 data MaybeFuncTo a = FuncTo (String -> MaybeFuncTo a) | Plain a
 
-app :: MaybeFuncTo String -> [String] -> String
+app :: MaybeFuncTo a -> [String] -> a
 app (FuncTo f) (x:xs) = app (f x) xs
 app (Plain x) []      = x
 app _ []              = error "Not enough arguments"
@@ -37,24 +37,37 @@ funcToWrite f = do
     writeFile fileName (app (cast f) (drop 1 args))
 
 funcToPlot :: ( Plotable a) => a -> IO ()
-funcToPlot f = plot f
+funcToPlot f = do
+      args <- getArgs
+      app (castPlot f) args
 
 plotListCode::String
 plotListCode = concat [ x ++ "\n" | x<- xs]
   where
     xs = ["import matplotlib.pyplot as plt" , "import numpy as np",    "from mpl_toolkits.mplot3d import Axes3D",  teribleString ,  "out= (''.join ( [c for line in file for c in line] [1:-1] ))" ,  "x = [float(x) for x in out.split(',')]",  "file.close()",  "plt.plot(range(0,len(x)),x)", "plt.show()" ] ::[String]
     teribleString = "file = open(\"data.txt\",)" :: String
-
+plotListTupCode::String
+plotListTupCode = concat [ x ++ "\n" | x<- xs]
+  where
+    xs = [" import matplotlib.pyplot as plt" , "import numpy as np", "from mpl_toolkits.mplot3d import Axes3D" , teribleString , "out= (''.join ( [c for line in file for c in line] [2:-2] ))" , "x = np.transpose ( [ [ float(p) for p in tup.split(',') ] for tup in out.split('),(')] )" , "print (x)" , "file.close()" , "plt.plot(x[0],x[1])" , "plt.show()" ]
+    teribleString = "file = open(\"data.txt\",)"
 
 class Plotable a where
-  plot :: a -> IO()
+  castPlot:: a -> MaybeFuncTo (IO ())
 
 instance (Read a, Plotable b) => Plotable ( a -> b ) where
-    plot f = FuncTo (plot . f . read)
+    castPlot f = FuncTo (castPlot . f . read)
 
 instance Plotable [Double] where
-  plot dat = do
+  castPlot dat = Plain (do
     writeFile "Data.txt" (show dat)
     putStrLn "On to python"
     writeFile "plotfile.py" plotListCode
-    callCommand "python plotfile.py"
+    callCommand "python plotfile.py" )
+
+instance Plotable [(Double,Double)] where
+  castPlot dat = Plain ( do
+    writeFile "Data.txt" (show dat)
+    putStrLn "On to python"
+    writeFile "plotfile.py" plotListTupCode
+    callCommand "python plotfile.py" )
