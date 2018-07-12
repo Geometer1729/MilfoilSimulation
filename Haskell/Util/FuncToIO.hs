@@ -3,7 +3,7 @@
 {-# LANGUAGE MonoLocalBinds       #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Haskell.Util.FuncToIO (funcToExe , funcToWrite, funcToPlot) where
+module Haskell.Util.FuncToIO (funcToExe , funcToWrite) where
 
 import           System.Environment
 import           System.Process
@@ -36,16 +36,25 @@ funcToWrite f = do
     let fileName = head args
     writeFile fileName (app (cast f) (drop 1 args))
 
-funcToPlot :: (Cast a) => a -> IO ()
-funcToPlot f = do
-  args <- getArgs
-  writeFile "Data.txt" (app (cast f) args)
-  putStrLn "On to python"
-  writeFile "plotfile.py" plotFileCode
-  callCommand "python plotfile.py"
+funcToPlot :: ( Plotable a) => a -> IO ()
+funcToPlot f = plot f
 
-plotFileCode::String
-plotFileCode = concat [ x ++ "\n" | x<- xs]
+plotListCode::String
+plotListCode = concat [ x ++ "\n" | x<- xs]
   where
     xs = ["import matplotlib.pyplot as plt" , "import numpy as np",    "from mpl_toolkits.mplot3d import Axes3D",  teribleString ,  "out= (''.join ( [c for line in file for c in line] [1:-1] ))" ,  "x = [float(x) for x in out.split(',')]",  "file.close()",  "plt.plot(range(0,len(x)),x)", "plt.show()" ] ::[String]
     teribleString = "file = open(\"data.txt\",)" :: String
+
+
+class Plotable a where
+  plot :: a -> IO()
+
+instance (Read a, Plotable b) => Plotable ( a -> b ) where
+    plot f = FuncTo (plot . f . read)
+
+instance Plotable [Double] where
+  plot dat = do
+    writeFile "Data.txt" (show dat)
+    putStrLn "On to python"
+    writeFile "plotfile.py" plotListCode
+    callCommand "python plotfile.py"
