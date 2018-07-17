@@ -11,13 +11,13 @@ winter = DYN cold
 cold::Frame->Frame
 cold f = (0,[(1,0),(0.6*c,0)])
   where
-    c = fst ( snd f !! 2 )
+    c = fst ( snd f !! 1 )
 
 postSurface::Phase
 postSurface = ODE ( (\f -> (fst f) > 100) , clearWatter)
 
 preSurface::Phase
-preSurface = ODE ( \f -> (fst . head . snd) f > ps * d , uniformBiomass )
+preSurface = ODE ( \f -> (fst f) > 100 || (fst . head . snd) f > ps * d , uniformBiomass )
 
 clearWatter::TSystem
 clearWatter _ [0,_] = [0,0]

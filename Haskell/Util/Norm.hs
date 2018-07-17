@@ -8,3 +8,9 @@ instance Normed Double where
 
 instance Normed a => Normed [a] where
   norm a b = sqrt $ sum $  map (^2) $ zipWith norm a b
+
+numLim:: (Normed a) => Double -> [a] -> a
+numLim eps xs = head final
+  where
+    pairs = zipWith (\x y -> (x,y,norm x y) ) xs (tail xs)
+    final = [y | (x,y,n) <- pairs , n < eps]
