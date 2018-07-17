@@ -16,10 +16,10 @@ numLim eps xs = head final
     final = [y | (x,y,n) <- pairs , n < eps]
 
 dynamify:: Normed b =>  (a -> Double ->  b) -> a -> Double ->  b
-dynamify func input tol = rollingDynamify func tol tol input
+dynamify func input tol = rollingDynamify func tol input tol
 
 rollingDynamify:: Normed b => (a -> Double ->  b) -> Double -> a ->  Double -> b
-rollingDynamify func tol try input = if dist < tol then next else rollingDynamify func tol (try/2) input
+rollingDynamify func tol input try = if dist < tol then next else rollingDynamify func tol input (try/2)
   where
     this = func input try
     next = func input (try/2)
