@@ -57,7 +57,7 @@ instance Plotable [Double] where
 plotListCode::String
 plotListCode = concat [ x ++ "\n" | x<- xs]
   where
-    xs = ["import matplotlib.pyplot as plt" , "import numpy as np",    "from mpl_toolkits.mplot3d import Axes3D",  teribleString ,  "out= (''.join ( [c for line in file for c in line] [1:-1] ))" ,  "x = [float(x) for x in out.split(',')]",  "file.close()",  "plt.plot(range(0,len(x)),x)", "plt.show()" ] ::[String]
+    xs = ["import matplotlib.pyplot as plt" , "import numpy as np", "from mpl_toolkits.mplot3d import Axes3D",  teribleString ,  "out= (''.join ( [c for line in file for c in line] [1:-1] ))" ,  "x = [float(x) for x in out.split(',')]",  "file.close()",  "plt.plot(range(0,len(x)),x)", "plt.show()" ] ::[String]
     teribleString = "file = open(\"data.txt\",)" :: String
 
 instance Plotable [(Double,Double)] where
@@ -70,5 +70,5 @@ instance Plotable [(Double,Double)] where
 plotListTupCode::String
 plotListTupCode = concat [ x ++ "\n" | x<- xs]
   where
-    xs = [" import matplotlib.pyplot as plt" , "import numpy as np", "from mpl_toolkits.mplot3d import Axes3D" , teribleString , "out= (''.join ( [c for line in file for c in line] [2:-2] ))" , "x = np.transpose ( [ [ float(p) for p in tup.split(',') ] for tup in out.split('),(')] )" , "print (x)" , "file.close()" , "plt.plot(x[0],x[1])" , "plt.show()" ]
+    xs = ["import matplotlib.pyplot as plt" , "import numpy as np", "from mpl_toolkits.mplot3d import Axes3D" , teribleString , "out= (''.join ( [c for line in file for c in line] [2:-2] ))" , "x = np.transpose ( [ [ float(p) for p in tup.split(',') ] for tup in out.split('),(')] )" , "file.close()" , "plt.plot(x[0],x[1])" , "plt.show()" ]
     teribleString = "file = open(\"data.txt\",)"

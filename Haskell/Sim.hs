@@ -13,4 +13,4 @@ getPlotable = fmap (fst . head . snd)
 
 
 --main = funcToPlot (\a b c d -> getPlotable (sim a b c d))
-main = funcToExe equalib
+main = funcToPlot createMap

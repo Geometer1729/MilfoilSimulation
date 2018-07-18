@@ -14,14 +14,13 @@ cold f = (0,[(1,0),(0.6*c,0)])
     c = fst ( snd f !! 1 )
 
 postSurface::Phase
-postSurface = ODE ( (\f -> (fst f) > 100) , clearWatter)
+postSurface = ODE ( \f -> (fst f) > 100 , clearWatter)
 
 preSurface::Phase
 preSurface = ODE ( \f -> (fst f) > 100 || (fst . head . snd) f > ps * d , uniformBiomass )
 
 clearWatter::TSystem
-clearWatter _ [0,_] = [0,0]
-clearWatter t [m,c] = [dm,dc]
+clearWatter t [m,c] = if m <= 0 then [0,0] else [dm,dc]
   where
     dc = dm*(0.06/0.94)
     dm = (* 0.94) $ (mewt / km) + log ( ( k1 + i0 ) / ( k1 + ird ) ) - m*( (lambdafunc . temp) t + delta )
@@ -30,8 +29,7 @@ clearWatter t [m,c] = [dm,dc]
     ird = i0 * exp(-(kwt*d+ km*m))
 
 uniformBiomass::TSystem
-uniformBiomass _ [0,_] = [0,0]
-uniformBiomass t [m,c] = [dm,dc]
+uniformBiomass t [m,c] = if m <= 0 then [0,0] else [dm,dc]
   where
     dm = mewt *m/(kwt * height + km *m) * log(( k1 + i0 )/(k1 + ird)) -m*( (lambdafunc . temp) t + delta ) -dc
     mewt = mew0 * thetag**( temp t - tb )
