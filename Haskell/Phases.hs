@@ -1,5 +1,6 @@
 module Haskell.Phases (winter,postSurface,preSurface) where
 
+import           Debug.Trace
 import           Haskell.Params
 import           Haskell.Util.Mixed
 import           Haskell.Util.RK4
@@ -20,7 +21,7 @@ preSurface::Phase
 preSurface = ODE ( \f -> (fst f) > 100 || (fst . head . snd) f > ps * d , uniformBiomass )
 
 clearWatter::TSystem
-clearWatter t [m,c] = if m <= 0 then [0,0] else [dm,dc]
+clearWatter t [m,c] = [dm,dc]
   where
     dc = dm*(0.06/0.94)
     dm = (* 0.94) $ (mewt / km) + log ( ( k1 + i0 ) / ( k1 + ird ) ) - m*( (lambdafunc . temp) t + delta )
@@ -29,7 +30,7 @@ clearWatter t [m,c] = if m <= 0 then [0,0] else [dm,dc]
     ird = i0 * exp(-(kwt*d+ km*m))
 
 uniformBiomass::TSystem
-uniformBiomass t [m,c] = if m <= 0 then [0,0] else [dm,dc]
+uniformBiomass t [m,c] = [dm,dc]
   where
     dm = mewt *m/(kwt * height + km *m) * log(( k1 + i0 )/(k1 + ird)) -m*( (lambdafunc . temp) t + delta ) -dc
     mewt = mew0 * thetag**( temp t - tb )

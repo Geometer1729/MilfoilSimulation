@@ -70,5 +70,18 @@ instance Plotable [(Double,Double)] where
 plotListTupCode::String
 plotListTupCode = concat [ x ++ "\n" | x<- xs]
   where
-    xs = ["import matplotlib.pyplot as plt" , "import numpy as np", "from mpl_toolkits.mplot3d import Axes3D" , teribleString , "out= (''.join ( [c for line in file for c in line] [2:-2] ))" , "x = np.transpose ( [ [ float(p) for p in tup.split(',') ] for tup in out.split('),(')] )" , "file.close()" , "plt.plot(x[0],x[1])" , "plt.show()" ]
+    xs = ["import matplotlib.pyplot as plt" , "import numpy as np", "from mpl_toolkits.mplot3d import Axes3D" , teribleString , "out= (''.join ( [c for line in file for c in line] [2:-2] ))" , "x = np.transpose ( [ [ float(p) for p in tup.split(',') ] for tup in out.split('),(')] )" , "file.close()" , "plt.scatter(x[0],x[1])" , "plt.show()" ]
+    teribleString = "file = open(\"data.txt\",)"
+
+instance Plotable [(Double,Double,Double)] where
+  castPlot dat = Plain ( do
+    writeFile "Data.txt" (show dat)
+    putStrLn "On to python"
+    writeFile "plotfile.py" plot3DCode
+    callCommand "python plotfile.py" )
+
+plot3DCode::String
+plot3DCode = concat [ x ++ "\n" | x<- xs]
+  where
+    xs =[ "import matplotlib.pyplot as plt","import numpy as np","from mpl_toolkits.mplot3d import Axes3D", teribleString ,"out= (''.join ( [c for line in file for c in line] [2:-2] ))" , "x = np.transpose ( [ [ float(p) for p in tup.split(',') ] for tup in out.split('),(')] )" ,  "file.close()" , "ax = plt.figure().add_subplot(111, projection='3d')" , "ax.scatter(x[0],x[1],x[2])" ,  "plt.show()" ]
     teribleString = "file = open(\"data.txt\",)"
