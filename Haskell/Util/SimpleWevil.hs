@@ -23,4 +23,4 @@ equalib eps tol step wevilM wevilC = result
     result = numLim eps chain :: Double
 
 createMap::Double -> Double -> Double -> Double -> [(Double,Double)]
-createMap eps tol step stop = [ x , equalib eps tol 1 x 0) | x <- [0,step..stop]]
+createMap eps tol step stop = [ (x , equalib eps tol 1 x 0) | x <- [0,step..stop]]
