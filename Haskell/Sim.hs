@@ -13,4 +13,4 @@ getPlotable = fmap (\ (t,[(m,_),(c,_)]) -> (m,c) )
 
 
 --main = funcToPlot (\a b c d -> getPlotable (sim a b c d))
-main = funcToWrite createMap
+main = funcToPlot createMap

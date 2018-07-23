@@ -1,5 +1,6 @@
 module Haskell.Util.SimpleWevil where
 
+
 import           Debug.Trace
 import           Haskell.Phases
 import           Haskell.Util.Mixed
@@ -29,17 +30,16 @@ equalib:: Double -> Double -> Double -> Double -> Double -> Double
 equalib eps tol step wevilM wevilC = result
   where
     func = carbToCarb tol step wevilM wevilC :: Double -> Double
-    chain = iterate func 1 :: [Double]
+    chain = iterate func baseMilfoil :: [Double]
     result = numLim eps chain :: Double
 
-createMap::Double -> Double -> Double -> Double -> Double -> Double -> [(Double,Double,Double)]
-createMap eps tol xstep xstop ystep ystop = [ (traceThis x , y , equalib eps tol 1 x y) | x <- [0,xstep..xstop] , y <- [0,ystep..ystop] ]
+createMap::Double -> Double -> Double -> Double -> Double -> Double -> ([[Double]],[[Double]],[[Double]])
+createMap eps tol xstep xstop ystep ystop = unzip3 $ map unzip3 $ map (map (carbToSeasonPeak tol 1)) [[ (x , y ,trace (show (x,y)) $ equalib eps tol 1 x y) | x <- [0,xstep..xstop] ] | y <- [0,ystep..ystop] ]
 
-testPt::Double -> Double -> (Double,Double) -> Bool
-testPt eps tol (x,y) = equalib eps tol 1 x y > 0.1
-
-pts::Double -> Double -> Double -> [(Double,Double)]
-pts step mx my = [trace (show (100*(x + step*(y/my))/(mx+step))) (x,y) | x <- [0,step..mx] , y <- [0,step..my] ]
-
-bad::Double -> Double -> Double -> Double -> Double -> [(Double,Double)]
-bad eps tol step mx my = filter (testPt eps tol) (pts step mx my)
+carbToSeasonPeak::Double -> Double -> (Double,Double,Double)->(Double,Double,Double)
+carbToSeasonPeak tol step (m,c,lc) = (m,c,peak)
+  where
+    model = wevilModel m c ::[Phase]
+    frames = multiPhase tol step model (0,[(baseMilfoil,0),(lc,0)]) ::[Frame]
+    ms = map (fst . head . snd) frames :: [Double]
+    peak = maximum ms :: Double

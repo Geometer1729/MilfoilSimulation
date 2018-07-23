@@ -37,3 +37,5 @@ iradianceAmp :: Double
 iradianceAmp = 50
 iradiancePhase :: Double
 iradiancePhase = 115
+baseMilfoil::Double
+baseMilfoil = 0.1
