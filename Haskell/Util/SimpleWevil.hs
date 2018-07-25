@@ -24,13 +24,13 @@ wevilModel:: Double -> Double -> [Phase]
 wevilModel wevilM wevilC = [(adjust [wevilM,wevilC] preSurface), (adjust [wevilM,wevilC] postSurface) ,winter]
 
 carbToCarb:: Double -> Double -> Double -> Double -> Double -> Double
-carbToCarb tol step wevilM wevilC c =  fst . (!!1) . snd . last $  multiPhase tol step  (wevilModel wevilM wevilC ) (0,[(1,0),(c,0)])
+carbToCarb tol step wevilM wevilC c =  fst . (!!1) . snd . last $  multiPhase tol step  (wevilModel wevilM wevilC ) (0,[(0,0),(c,0)])
 
 equalib:: Double -> Double -> Double -> Double -> Double -> Double
 equalib eps tol step wevilM wevilC = result
   where
     func = carbToCarb tol step wevilM wevilC :: Double -> Double
-    chain = iterate func baseMilfoil :: [Double]
+    chain = iterate func 1000 :: [Double]
     result = numLim eps chain :: Double
 
 createMap::Double -> Double -> Double -> Double -> Double -> Double -> ([[Double]],[[Double]],[[Double]])
@@ -40,6 +40,6 @@ carbToSeasonPeak::Double -> Double -> (Double,Double,Double)->(Double,Double,Dou
 carbToSeasonPeak tol step (m,c,lc) = (m,c,peak)
   where
     model = wevilModel m c ::[Phase]
-    frames = multiPhase tol step model (0,[(baseMilfoil,0),(lc,0)]) ::[Frame]
+    frames = multiPhase tol step model (0,[(0,0),(lc,0)]) ::[Frame]
     ms = map (fst . head . snd) frames :: [Double]
     peak = maximum ms :: Double
