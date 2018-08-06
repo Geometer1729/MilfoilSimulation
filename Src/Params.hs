@@ -1,4 +1,4 @@
-module Haskell.Params where
+module Params where
 
 
 kwt :: Double -- light atenuation coefficient (water clarity)

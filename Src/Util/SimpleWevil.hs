@@ -1,11 +1,11 @@
-module Haskell.Util.SimpleWevil where
+module Util.SimpleWevil where
 
 
 import           Debug.Trace
-import           Haskell.Phases
-import           Haskell.Util.Mixed
-import           Haskell.Util.Norm
-import           Haskell.Util.RK4
+import           Phases
+import           Util.Mixed
+import           Util.Norm
+import           Util.RK4
 
 traceThis:: (Show a) => a -> a
 traceThis x = trace (show x) x

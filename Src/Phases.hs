@@ -1,9 +1,9 @@
-module Haskell.Phases (winter,postSurface,preSurface,uniformSun) where
+module Phases (winter,postSurface,preSurface,uniformSun) where
 
 import           Debug.Trace
-import           Haskell.Params
-import           Haskell.Util.Mixed
-import           Haskell.Util.RK4
+import           Params
+import           Util.Mixed
+import           Util.RK4
 --just for the type names
 
 winter::Phase

@@ -3,7 +3,7 @@
 {-# LANGUAGE MonoLocalBinds       #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Haskell.Util.FuncToIO (funcToExe , funcToWrite ,funcToPlot) where
+module Util.FuncToIO (funcToExe , funcToWrite ,funcToPlot) where
 
 import           System.Environment
 import           System.Process

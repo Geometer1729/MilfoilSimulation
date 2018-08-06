@@ -1,8 +1,8 @@
-import           Haskell.Phases
-import           Haskell.Util.FuncToIO
-import           Haskell.Util.Mixed
-import           Haskell.Util.RK4
-import           Haskell.Util.SimpleWevil
+import           Phases
+import           Util.FuncToIO
+import           Util.Mixed
+import           Util.RK4
+import           Util.SimpleWevil
 
 sim:: Int -> Double -> Double -> Double -> Double -> [Frame]
 sim years seed tol wm wc = multiPhase tol 1 (take (3*years) ( cycle (wevilModel wm wc))) (0,[(seed,0),(0,0)])

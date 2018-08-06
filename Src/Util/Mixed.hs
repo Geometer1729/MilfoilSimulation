@@ -1,7 +1,7 @@
-module Haskell.Util.Mixed (multiPhase,Phase(ODE,DYN))where
+module Util.Mixed (multiPhase,Phase(ODE,DYN))where
 
-import           Haskell.Params
-import           Haskell.Util.RK4
+import           Params
+import           Util.RK4
 
 data Phase = ODE (Con,TSystem) | DYN (Frame -> Frame)
 

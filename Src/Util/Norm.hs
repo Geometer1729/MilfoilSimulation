@@ -1,4 +1,4 @@
-module Haskell.Util.Norm (Normed,norm,numLim,dynamify) where
+module Util.Norm (Normed,norm,numLim,dynamify) where
 
 class Normed a where
   norm :: a -> a -> Double

@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
-module Haskell.Util.RK4 (smartRK4Step,rK4Step,simulate,getPt,Pos,Frame,Con,TSystem) where
-import           Haskell.Util.Norm
+module Util.RK4 (smartRK4Step,rK4Step,simulate,getPt,Pos,Frame,Con,TSystem) where
+import Util.Norm
 
 type Pos = (Double , Double) -- state then change
 
